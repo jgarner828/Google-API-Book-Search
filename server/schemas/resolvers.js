@@ -1,26 +1,58 @@
-const { Tech, Matchup } = require('../models');
+const { AuthenticationError } = require('apollo-server-express');
+const { User } = require('../models');
+const { signToken } = require('../utils/auth');
 
 const resolvers = {
   Query: {
-    allTech: async () => {
-      return Tech.find();
+    getSingleUser: async (parent, { userId }) => {
+      return User.findOne({ _id: userId });
     },
-    allMatchup: async () => {
-      return Matchup.find();
-    },
-    matchup: async (parent, { matchupId }) => {
-      return Matchup.findOne({_id: matchupId});
-    },
+  },
 
   Mutation: {
-    addMatchup: async (parent, {tech1, tech2 }) => {
-      Matchup.create({ tech1, tech2 })
-    },
-    
-  }
-    
+    createUser: async (parent, { name, email, password }) => {
+      const user = await User.create({ name, email, password });
+      const token = signToken(user);
 
+      return { token, user };
+    },
+    login: async (parent, { email, password }) => {
+      const user = await User.findOne({ email });
+
+      if (!user) {
+        throw new AuthenticationError('No user with this email found!');
+      }
+
+      const correctPw = await user.isCorrectPassword(password);
+
+      if (!correctPw) {
+        throw new AuthenticationError('Incorrect password!');
+      }
+
+      const token = signToken(user);
+      return { token, user };
+    },
+
+    saveBook: async (parent, { userId, book }) => {
+      return User.findOneAndUpdate(
+        { _id: userId },
+        {
+          $addToSet: { savedBooks: book },
+        },
+        {
+          new: true,
+          runValidators: true,
+        }
+      );
+    },
+    deleteBook: async (parent, { userId, bookId }) => {
+      return User.findOneAndUpdate(
+        { _id: userId },
+        { $pull: { savedBooks: { bookId: bookId } } },
+        { new: true }
+      );
+    },
   },
-}
+};
 
 module.exports = resolvers;
