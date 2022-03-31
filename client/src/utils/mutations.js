@@ -1,7 +1,6 @@
 import { gql } from '@apollo/client';
 
 export const LOGIN_USER = gql`
-  # create a GraphQL query to be executed by Apollo Client
   mutation login($email: String!, $password: String!) {
     login(email: $email, password: $password) {
       token
@@ -23,7 +22,6 @@ export const LOGIN_USER = gql`
   }  
 `;
 export const ADD_USER = gql`
-  # create a GraphQL query to be executed by Apollo Client
   mutation createUser($username: String!, $email: String!, $password: String!) {
     createUser(username: $username, email: $email, password: $password) {
       token
@@ -45,13 +43,13 @@ export const ADD_USER = gql`
   }
 `;
 export const SAVE_BOOK = gql`
-  # create a GraphQL query to be executed by Apollo Client
-  mutation saveBook(input: $input) {
+  mutation saveBook($input: String!) {
+    saveBook(input: $input) {
+      _id
     }
   }
 `;
 export const REMOVE_BOOK = gql`
-  # create a GraphQL query to be executed by Apollo Client
   mutation deleteBook($bookId: ID!) {
     deleteBook(bookId: $bookId) {
       username
