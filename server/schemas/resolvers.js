@@ -4,6 +4,12 @@ const { signToken } = require('../utils/auth');
 
 const resolvers = {
   Query: {
+    me: async (parent, args, context) => {
+      if (context.user) {
+        return User.findOne({ _id: context.user._id });
+      }
+      throw new AuthenticationError('You need to be logged in!');
+    },
     getSingleUser: async (parent, { userId }) => {
       return User.findOne({ _id: userId });
     },
@@ -14,7 +20,11 @@ const resolvers = {
       const user = await User.create({ username, email, password });
       const token = signToken(user);
 
-      return { token, user };
+      console.log('inside server mutatation createUser... user and token to follow')
+      console.log(user);
+      console.log(token);
+
+      return { token,  user };
     },
     login: async (parent, { email, password }) => {
       const user = await User.findOne({ email });
@@ -30,14 +40,18 @@ const resolvers = {
       }
 
       const token = signToken(user);
+
+      console.log('inside server mutatation login... user and token to follow')
+      console.log(user)
+      console.log(token)
       return { token, user };
     },
 
-    saveBook: async (parent, { userId, book }) => {
+    saveBook: async (parent, { bookData }, context) => {
       return User.findOneAndUpdate(
-        { _id: userId },
+        { _id: context.user._id },
         {
-          $addToSet: { savedBooks: book },
+          $addToSet: { savedBooks: bookData },
         },
         {
           new: true,

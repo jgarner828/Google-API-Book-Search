@@ -39,11 +39,15 @@ const SignupForm = () => {
 
     try {
 
+      console.log('about to run createUser'      )
       const response = await createUser({
         variables: { ...userFormData }
       });
 
-      console.log('response: ', response)
+
+      console.log('this is the response from createUser')
+      console.log(response)
+      console.log('this is the response token from createUser')
       console.log(response.data.createUser.token)
 
       Auth.login(response.data.createUser.token)

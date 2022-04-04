@@ -14,7 +14,7 @@ const LoginForm = () => {
 
 
 
-  const [loginUser, { data, loading, error }] = useMutation(LOGIN_USER);
+  const [loginUser, { error }] = useMutation(LOGIN_USER);
 
 
 
@@ -37,7 +37,12 @@ const LoginForm = () => {
 
     try {
       const response = await loginUser({variables: { ...userFormData } });
-      Auth.login(response.data.loginUser.token);
+
+      console.log('this is the response from loginUser ')
+      console.log(response)
+      console.log('this is the response token from loginUser ')
+      console.log(response.data.login.token)
+      Auth.login(response.data.login.token);
 
       
     } catch (err) {
