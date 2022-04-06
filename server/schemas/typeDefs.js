@@ -36,7 +36,7 @@ input BookInput {
   }
 
   type Query {
-      me: User
+      Me: User
       getSingleUser(_id: ID!): User
   }
 
